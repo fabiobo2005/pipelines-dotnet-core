@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
+// Teste Integração VSCode com Az DeOps e CI/CD
+
 namespace pipelines_dotnet_core
 {
     public class Program
