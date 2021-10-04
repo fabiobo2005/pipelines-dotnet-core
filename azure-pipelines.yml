@@ -4,43 +4,40 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-    - master
+- master
     
-    pool:
-      vmImage: 'ubuntu-latest'
+pool:
+ vmImage: 'ubuntu-latest'
     
-    variables:
-      solution: '**/*.sln'
-      buildPlatform: 'Any CPU'
-      buildConfiguration: 'Release'
+variables:
+ buildConfiguration: 'Release'
     
-    steps:
+steps:
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+   command: restore
+   projects: '**/*.csproj'
     
-    - task: DotNetCoreCLI@2
-      displayName: Restore
-      inputs:
-        command: restore
-        projects: '**/*.csproj'
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+   command: build
+   projects: '**/*.csproj'
+   arguments: '--configuration $(buildConfiguration)' # Update this to match your need
     
-    - task: DotNetCoreCLI@2
-      displayName: Build
-      inputs:
-        command: build
-        projects: '**/*.csproj'
-        arguments: '--configuration $(buildConfiguration)' # Update this to match your need
+- task: DotNetCoreCLI@2
+  displayName: Package
+  inputs:
+   command: publish
+   publishWebProjects: True
+   arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+   zipAfterPublish: True
     
-    - task: DotNetCoreCLI@2
-      displayName: Package
-      inputs:
-        command: publish
-        publishWebProjects: True
-        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-        zipAfterPublish: True
+# this code takes all the files in $(Build.ArtifactStagingDirectory) and uploads them as an artifact of your build.
     
-    # this code takes all the files in $(Build.ArtifactStagingDirectory) and uploads them as an artifact of your build.
-    
-    - task: PublishBuildArtifacts@1
-      displayName: "Publish as artifact"
-      inputs:
-        pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-        artifactName: 'myWebsiteName'
+- task: PublishBuildArtifacts@1
+  displayName: "Publish as artifact"
+  inputs:
+   pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+   artifactName: 'myWebsiteName'
